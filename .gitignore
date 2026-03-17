@@ -1,34 +1,106 @@
-# Gradle files
-.gradle/
+# ------------------------------
+# Built application files
+# ------------------------------
+*.apk
+*.aab
+*.ap_
+
+# ------------------------------
+# Dalvik / ART
+# ------------------------------
+*.dex
+
+# ------------------------------
+# Java / Kotlin compiled files
+# ------------------------------
+*.class
+
+# ------------------------------
+# Generated files
+# ------------------------------
+bin/
+gen/
+out/
 build/
 
-# Local configuration file (sdk path, etc)
+# ------------------------------
+# Gradle
+# ------------------------------
+.gradle/
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# ------------------------------
+# Local config (SDK path, etc.)
+# ------------------------------
 local.properties
 
-# Log/OS Files
+# ------------------------------
+# Proguard / R8
+# ------------------------------
+proguard/
+*.pro
+
+# ------------------------------
+# Logs
+# ------------------------------
 *.log
 
-# Android Studio generated files and folders
-captures/
-.externalNativeBuild/
-.cxx/
-*.aab
-*.apk
-output-metadata.json
-
-# IntelliJ
-*.iml
+# ------------------------------
+# Android Studio / IntelliJ
+# ------------------------------
 .idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
+*.iml
+*.ipr
+*.iws
 
-# Keystore files
+# ------------------------------
+# Signing files (KEEP PRIVATE)
+# ------------------------------
 *.jks
 *.keystore
 
-# Google Services (e.g. APIs or Firebase)
-google-services.json
+# ------------------------------
+# Native build
+# ------------------------------
+.externalNativeBuild/
+.cxx/
 
-# Android Profiling
+# ------------------------------
+# Google / Firebase (optional)
+# ------------------------------
+google-services.json
+com_crashlytics_export_strings.xml
+crashlytics.properties
+
+# ------------------------------
+# Navigation / kapt
+# ------------------------------
+.navigation/
+kapt/
+
+# ------------------------------
+# OS-specific
+# ------------------------------
+.DS_Store
+Thumbs.db
+
+# ------------------------------
+# NDK / CMake
+# ------------------------------
+obj/
+cmake-build-*/
+
+# ------------------------------
+# Profiling
+# ------------------------------
 *.hprof
+
+# ------------------------------
+# SQLite (ONLY runtime files)
+# ------------------------------
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
