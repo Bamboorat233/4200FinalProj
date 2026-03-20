@@ -2,6 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Network permissions for future network features -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Storage permissions for report generation -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29"
+        tools:ignore="ScopedStorage" />
+
+    <!-- Camera for profile photos -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,7 +27,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme._4200FinalProj">
         <activity
-            android:name=".MainActivity"
+            android:name=".UI.Activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,6 +35,33 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".UI.Activities.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.Activities.Patient.PatientListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.Activities.Patient.PatientFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.Activities.Doctor.DoctorListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.Activities.Doctor.DoctorFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.Activities.Department.DepartmentListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.Activities.Department.DepartmentFormActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.Activities.Appointment.AppointmentListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UI.Activities.Appointment.AppointmentFormActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
