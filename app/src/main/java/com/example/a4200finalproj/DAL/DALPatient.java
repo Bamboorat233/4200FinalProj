@@ -1,4 +1,4 @@
-package com.example.comp4200project;
+package com.example.a4200finalproj.DAL;
 
 import java.sql.*;
 import java.util.ArrayList;

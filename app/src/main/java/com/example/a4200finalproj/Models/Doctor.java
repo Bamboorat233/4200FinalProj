@@ -1,4 +1,4 @@
-package com.example.comp4200project;
+package com.example.a4200finalproj.Models;
 
 public class Doctor {
 
