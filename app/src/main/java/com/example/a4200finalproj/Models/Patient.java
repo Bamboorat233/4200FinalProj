@@ -1,39 +1,103 @@
-package com.example.comp4200project;
-
-import java.sql.Date;
-
+package com.example.a4200finalproj.Models;
 
 public class Patient {
+    private int id;
+    private String fullName;
+    private String dateOfBirth;
+    private String gender;
+    private String phone;
+    private String email;
+    private String address;
+    private String emergencyContact;
+    private String emergencyPhone;
+    private String bloodType;
+    private String allergies;
 
-    public int PatientID;
-    public String Name;
-    public Date DOB;
-    public String Gender;
-    public String Contact;
-    public String Address;
+    public int getId() {
+        return id;
+    }
 
-    public int getPatientID(){return PatientID;}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public void setPatientID(int PatientID){this.PatientID = PatientID;}
+    public String getFullName() {
+        return fullName;
+    }
 
-    public String getName(){return Name;}
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-    public void setName(String Name){this.Name = Name;}
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
 
-    public Date getDOB(){return DOB;}
+    public void setDateOfBirth(String dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
 
-    public void setDOB(Date DOB){this.DOB = DOB;}
+    public String getGender() {
+        return gender;
+    }
 
-    public String getGender(){return Gender;}
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
 
-    public void setGender(String Gender){this.Gender = Gender;}
+    public String getPhone() {
+        return phone;
+    }
 
-    public String getContact(){return Contact;}
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-    public void setContact(String Contact){this.Contact = Contact;}
+    public String getEmail() {
+        return email;
+    }
 
-    public String getAddress(){return Address;}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public void setAddress(String Address){this.Address = Address;}
+    public String getAddress() {
+        return address;
+    }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getEmergencyContact() {
+        return emergencyContact;
+    }
+
+    public void setEmergencyContact(String emergencyContact) {
+        this.emergencyContact = emergencyContact;
+    }
+
+    public String getEmergencyPhone() {
+        return emergencyPhone;
+    }
+
+    public void setEmergencyPhone(String emergencyPhone) {
+        this.emergencyPhone = emergencyPhone;
+    }
+
+    public String getBloodType() {
+        return bloodType;
+    }
+
+    public void setBloodType(String bloodType) {
+        this.bloodType = bloodType;
+    }
+
+    public String getAllergies() {
+        return allergies;
+    }
+
+    public void setAllergies(String allergies) {
+        this.allergies = allergies;
+    }
 }
