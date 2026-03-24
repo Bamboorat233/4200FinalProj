@@ -1,130 +1,109 @@
-package com.example.comp4200project;
-import java.sql.*;
+package com.example.a4200finalproj.DAL;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+
+import com.example.a4200finalproj.Models.Appointment;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DALAppointment extends DALBase {
+public class DALAppointment {
 
-    //CREATE
-    public void addAppointment(Appointment a) {
-        String sql =
-                "INSERT INTO Appointment (PatientID, DoctorID, AppointmentDate, AppointmentTime, Status) " +
-                        "VALUES (?, ?, ?, ?, ?)";
+    private final DatabaseHelper db;
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, a.getPatientID());
-            stmt.setInt(2, a.getDoctorID());
-            stmt.setTimestamp(3, new Timestamp(a.getAppointmentDate().getTime()));
-            stmt.setTime(4, a.getAppointmentTime()); // java.sql.Time
-            stmt.setString(5, a.getStatus());
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public DALAppointment(Context context) {
+        db = DatabaseHelper.getInstance(context);
     }
 
+    public long addAppointment(Appointment a) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_PATIENT_ID, a.getPatientId());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_DOCTOR_ID, a.getDoctorId());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_DEPARTMENT_ID, a.getDepartmentId());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_APPOINTMENT_DATE, a.getAppointmentDate());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_APPOINTMENT_TIME, a.getAppointmentTime());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_REASON, a.getReason());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_STATUS, a.getStatus());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_NOTES, a.getNotes());
+        return db.insertAppointment(cv);
+    }
 
     public Appointment getAppointmentById(int id) {
-        String sql =
-                "SELECT AppointmentID, PatientID, DoctorID, AppointmentDate, AppointmentTime, Status " +
-                        "FROM Appointment WHERE AppointmentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Appointment a = new Appointment();
-                    a.setAppointmentID(rs.getInt(1));
-                    a.setPatientID(rs.getInt(2));
-                    a.setDoctorID(rs.getInt(3));
-                    a.setAppointmentDate(rs.getDate(4));
-                    a.setAppointmentTime(rs.getTime(5)); // maps from SQL TIME
-                    a.setStatus(rs.getString(6));
-                    return a;
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Cursor cursor = db.getAppointmentById(id);
+        if (cursor != null && cursor.moveToFirst()) {
+            Appointment a = cursorToAppointment(cursor);
+            cursor.close();
+            return a;
         }
-
         return null;
     }
 
-    //get all
     public List<Appointment> getAllAppointments() {
-        String sql =
-                "SELECT AppointmentID, PatientID, DoctorID, AppointmentDate, AppointmentTime, Status " +
-                        "FROM Appointment";
-
         List<Appointment> list = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Appointment a = new Appointment();
-                a.setAppointmentID(rs.getInt(1));
-                a.setPatientID(rs.getInt(2));
-                a.setDoctorID(rs.getInt(3));
-                a.setAppointmentDate(rs.getDate(4));
-                a.setAppointmentTime(rs.getTime(5));
-                a.setStatus(rs.getString(6));
-
-                list.add(a);
+        Cursor cursor = db.getAllAppointments();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToAppointment(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
         return list;
     }
 
-    //UPDATE
-    public void updateAppointment(Appointment a) {
-        String sql =
-                "UPDATE Appointment SET " +
-                        "PatientID = ?, DoctorID = ?, AppointmentDate = ?, AppointmentTime = ?, Status = ? " +
-                        "WHERE AppointmentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, a.getPatientID());
-            stmt.setInt(2, a.getDoctorID());
-            stmt.setTimestamp(3, new Timestamp(a.getAppointmentDate().getTime()));
-            stmt.setTime(4, a.getAppointmentTime());
-            stmt.setString(5, a.getStatus());
-            stmt.setInt(6, a.getAppointmentID());
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public List<Appointment> getByPatient(int patientId) {
+        List<Appointment> list = new ArrayList<>();
+        Cursor cursor = db.getAppointmentsByPatient(patientId);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToAppointment(cursor));
+            }
+            cursor.close();
         }
+        return list;
     }
 
-    //DELETE
-    public void deleteAppointment(int id) {
-        String sql = "DELETE FROM Appointment WHERE AppointmentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public List<Appointment> getByDoctor(int doctorId) {
+        List<Appointment> list = new ArrayList<>();
+        Cursor cursor = db.getAppointmentsByDoctor(doctorId);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToAppointment(cursor));
+            }
+            cursor.close();
         }
+        return list;
+    }
+
+    public int updateAppointment(Appointment a) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_PATIENT_ID, a.getPatientId());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_DOCTOR_ID, a.getDoctorId());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_DEPARTMENT_ID, a.getDepartmentId());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_APPOINTMENT_DATE, a.getAppointmentDate());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_APPOINTMENT_TIME, a.getAppointmentTime());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_REASON, a.getReason());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_STATUS, a.getStatus());
+        cv.put(DatabaseHelper.TableAppointment.COLUMN_NOTES, a.getNotes());
+        return db.updateAppointment(a.getId(), cv);
+    }
+
+    public int deleteAppointment(int id) {
+        return db.deleteAppointment(id);
+    }
+
+    private Appointment cursorToAppointment(Cursor cursor) {
+        Appointment a = new Appointment();
+        a.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableAppointment.COLUMN_ID)));
+        a.setPatientId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableAppointment.COLUMN_PATIENT_ID)));
+        a.setDoctorId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableAppointment.COLUMN_DOCTOR_ID)));
+        a.setDepartmentId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableAppointment.COLUMN_DEPARTMENT_ID)));
+        a.setAppointmentDate(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableAppointment.COLUMN_APPOINTMENT_DATE)));
+        a.setAppointmentTime(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableAppointment.COLUMN_APPOINTMENT_TIME)));
+        a.setReason(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableAppointment.COLUMN_REASON)));
+        a.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableAppointment.COLUMN_STATUS)));
+        a.setNotes(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableAppointment.COLUMN_NOTES)));
+        return a;
     }
 }

@@ -1,154 +1,87 @@
-package com.example.comp4200project;
+package com.example.a4200finalproj.DAL;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 
+import com.example.a4200finalproj.Models.User;
 
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DALUser extends DALBase {
+public class DALUser {
 
+    private final DatabaseHelper db;
+
+    public DALUser(android.content.Context context) {
+        db = DatabaseHelper.getInstance(context);
+    }
 
     public User authenticate(String username, String password) {
-
-        String sql =
-                "SELECT UserID, Username, Password, Role, Email, CreatedDate, IsActive " +
-                        "FROM [User] " + "WHERE Username = ? AND Password = ? AND IsActive = 1";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, username);
-            stmt.setString(2, password);
-
-            ResultSet rs = stmt.executeQuery();
-
-            if (!rs.next()) return null;
-
-            User user = new User();
-            user.setUserID(rs.getInt("UserID"));
-            user.setUsername(rs.getString("Username"));
-            user.setPassword(rs.getString("Password"));
-            user.setRole(rs.getString("Role"));
-            user.setEmail(rs.getString("Email"));
-            user.setCreatedDate(rs.getTimestamp("CreatedDate"));
-            user.setisActive(rs.getBoolean("IsActive"));
-
-            return user;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (db.authenticateUser(username, password)) {
+            Cursor cursor = db.getUserByUsername(username);
+            if (cursor != null && cursor.moveToFirst()) {
+                User user = cursorToUser(cursor);
+                cursor.close();
+                return user;
+            }
         }
-
         return null;
     }
 
-
-
-    public void addUser(User u) {
-
-        String sql =
-                "INSERT INTO [User] (Username, Password, Role, Email, CreatedDate, IsActive) " +
-                        "VALUES (?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, u.getUsername());
-            stmt.setString(2, u.getPassword());
-            stmt.setString(3, u.getRole());
-            stmt.setString(4, u.getEmail());
-            stmt.setTimestamp(5, new Timestamp(u.getCreatedDate().getTime()));
-            stmt.setBoolean(6, u.getisActive());
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public long addUser(User u) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableUser.COLUMN_USERNAME, u.getUsername());
+        cv.put(DatabaseHelper.TableUser.COLUMN_PASSWORD, u.getPassword());
+        cv.put(DatabaseHelper.TableUser.COLUMN_FULL_NAME, u.getFullName());
+        cv.put(DatabaseHelper.TableUser.COLUMN_EMAIL, u.getEmail());
+        cv.put(DatabaseHelper.TableUser.COLUMN_ROLE, u.getRole());
+        cv.put(DatabaseHelper.TableUser.COLUMN_PHONE, u.getPhone());
+        cv.put(DatabaseHelper.TableUser.COLUMN_ADDRESS, u.getAddress());
+        cv.put(DatabaseHelper.TableUser.COLUMN_IS_ACTIVE, u.getIsActive());
+        return db.insertUser(cv);
     }
 
-
-
     public List<User> getAllUsers() {
-
-        String sql =
-                "SELECT UserID, Username, Password, Role, Email, CreatedDate, IsActive " +
-                        "FROM [User] " +
-                        "ORDER BY Username";
-
         List<User> users = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-
-                User user = new User();
-                user.setUserID(rs.getInt("UserID"));
-                user.setUsername(rs.getString("Username"));
-                user.setPassword(rs.getString("Password"));
-                user.setRole(rs.getString("Role"));
-                user.setEmail(rs.getString("Email"));
-                user.setCreatedDate(rs.getTimestamp("CreatedDate"));
-                user.setisActive(rs.getBoolean("IsActive"));
-
-                users.add(user);
+        Cursor cursor = db.getAllUsers();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                users.add(cursorToUser(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
         return users;
     }
 
-
-
     public int updateUser(User u) {
-
-        String sql =
-                "UPDATE [User] " +
-                        "SET Username = ?, Password = ?, Role = ?, Email = ?, IsActive = ? " +
-                        "WHERE UserID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, u.getUsername());
-            stmt.setString(2, u.getPassword());
-            stmt.setString(3, u.getRole());
-            stmt.setString(4, u.getEmail());
-            stmt.setBoolean(5, u.getisActive());
-            stmt.setInt(6, u.getUserID());
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableUser.COLUMN_FULL_NAME, u.getFullName());
+        cv.put(DatabaseHelper.TableUser.COLUMN_EMAIL, u.getEmail());
+        cv.put(DatabaseHelper.TableUser.COLUMN_ROLE, u.getRole());
+        cv.put(DatabaseHelper.TableUser.COLUMN_PHONE, u.getPhone());
+        cv.put(DatabaseHelper.TableUser.COLUMN_ADDRESS, u.getAddress());
+        cv.put(DatabaseHelper.TableUser.COLUMN_IS_ACTIVE, u.getIsActive());
+        if (u.getPassword() != null && !u.getPassword().isEmpty()) {
+            cv.put(DatabaseHelper.TableUser.COLUMN_PASSWORD, u.getPassword());
         }
-
-        return 0;
+        return db.updateUser(u.getId(), cv);
     }
 
-
-    // Delete user
     public int deleteById(int userId) {
+        return db.deleteUser(userId);
+    }
 
-        String sql = "DELETE FROM [User] WHERE UserID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, userId);
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+    private User cursorToUser(Cursor cursor) {
+        User user = new User();
+        user.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableUser.COLUMN_ID)));
+        user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableUser.COLUMN_USERNAME)));
+        user.setPassword(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableUser.COLUMN_PASSWORD)));
+        user.setFullName(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableUser.COLUMN_FULL_NAME)));
+        user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableUser.COLUMN_EMAIL)));
+        user.setRole(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableUser.COLUMN_ROLE)));
+        user.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableUser.COLUMN_PHONE)));
+        user.setAddress(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableUser.COLUMN_ADDRESS)));
+        user.setIsActive(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableUser.COLUMN_IS_ACTIVE)));
+        return user;
     }
 }

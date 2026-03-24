@@ -1,33 +1,56 @@
-package com.example.comp4200project;
-
-import java.sql.Timestamp;
+package com.example.a4200finalproj.Models;
 
 public class Report {
+    private int id;
+    private String reportType;
+    private String title;
+    private int patientId;
+    private int doctorId;
+    private String generatedDate;
+    private String data;
+    private String filePath;
+    private String generatedBy;
+    private String createdAt;
 
-    public int ReportID;
-    public int PatientID;
-    public int DoctorID;
-    public Timestamp ReportDate;
-    public String Diagnosis;
-    public String Treatment;
+    // Display-only
+    private String patientName;
+    private String doctorName;
 
-    public int getReportID(){return ReportID;}
-    public void setReportID(int ReportID){this.ReportID = ReportID;}
+    public Report() {}
 
-    public int getPatientID(){return PatientID;}
-    public void setPatientID(int PatientID){this.PatientID = PatientID;}
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public int getDoctorID(){return DoctorID;}
-    public void setDoctorID(int DoctorID){this.DoctorID = DoctorID;}
+    public String getReportType() { return reportType; }
+    public void setReportType(String reportType) { this.reportType = reportType; }
 
-    public Timestamp getReportDate(){return ReportDate;}
-    public void setReportDate(Timestamp ReportDate){this.ReportDate = ReportDate;}
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public String getDiagnosis(){return Diagnosis;}
-    public void setDiagnosis(String Diagnosis){this.Diagnosis = Diagnosis;}
+    public int getPatientId() { return patientId; }
+    public void setPatientId(int patientId) { this.patientId = patientId; }
 
-    public String getTreatment(){return Treatment;}
-    public void setTreatment(String Treatment){this.Treatment = Treatment;}
+    public int getDoctorId() { return doctorId; }
+    public void setDoctorId(int doctorId) { this.doctorId = doctorId; }
 
+    public String getGeneratedDate() { return generatedDate; }
+    public void setGeneratedDate(String generatedDate) { this.generatedDate = generatedDate; }
 
+    public String getData() { return data; }
+    public void setData(String data) { this.data = data; }
+
+    public String getFilePath() { return filePath; }
+    public void setFilePath(String filePath) { this.filePath = filePath; }
+
+    public String getGeneratedBy() { return generatedBy; }
+    public void setGeneratedBy(String generatedBy) { this.generatedBy = generatedBy; }
+
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public String getPatientName() { return patientName; }
+    public void setPatientName(String patientName) { this.patientName = patientName; }
+
+    public String getDoctorName() { return doctorName; }
+    public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
 }

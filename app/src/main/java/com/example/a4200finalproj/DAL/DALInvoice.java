@@ -1,208 +1,105 @@
-package com.example.comp4200project;
+package com.example.a4200finalproj.DAL;
 
-import java.sql.*;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+
+import com.example.a4200finalproj.Models.Invoice;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DALInvoice extends DALBase {
+public class DALInvoice {
 
-    public Invoice getById(int id) {
+    private final DatabaseHelper db;
 
-        String sql = "SELECT InvoiceID, PatientID, AppointmentID, Amount, DateIssued, Status " +
-                "FROM dbo.Invoice WHERE InvoiceID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            ResultSet rs = stmt.executeQuery();
-
-                if (!rs.next())
-                    return null;
-
-                Invoice i = new Invoice();
-
-                i.setInvoiceID(rs.getInt(1));
-                i.setPatientID(rs.getInt(2));
-                i.setAppointmentID(rs.getInt(3));
-                i.setAmount(rs.getDouble(4));
-                i.setDateIssued(rs.getTimestamp(5));
-                i.setStatus(rs.getString(6));
-
-                return i;
-
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public DALInvoice(Context context) {
+        db = DatabaseHelper.getInstance(context);
     }
 
-    public Invoice getByAppointment(int appointmentId) {
+    public long insert(Invoice i) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_PATIENT_ID, i.getPatientId());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_INVOICE_NUMBER, db.generateInvoiceNumber());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_INVOICE_DATE, i.getInvoiceDate());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_DUE_DATE, i.getDueDate());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_SUBTOTAL, i.getSubtotal());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_TAX, i.getTax());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_TOTAL, i.getTotal());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_STATUS, i.getStatus());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_NOTES, i.getNotes());
+        return db.insertInvoice(cv);
+    }
 
-        String sql = "SELECT InvoiceID, PatientID, AppointmentID, Amount, DateIssued, Status " +
-                "FROM dbo.Invoice WHERE AppointmentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, appointmentId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                if (!rs.next())
-                    throw new RuntimeException("Invoice not found for this appointment.");
-
-                Invoice i = new Invoice();
-
-                i.setInvoiceID(rs.getInt(1));
-                i.setPatientID(rs.getInt(2));
-                i.setAppointmentID(rs.getInt(3));
-                i.setAmount(rs.getDouble(4));
-                i.setDateIssued(rs.getTimestamp(5));
-                i.setStatus(rs.getString(6));
-
-                return i;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public Invoice getById(int id) {
+        Cursor cursor = db.getInvoiceById(id);
+        if (cursor != null && cursor.moveToFirst()) {
+            Invoice i = cursorToInvoice(cursor);
+            cursor.close();
+            return i;
         }
-
         return null;
     }
 
     public List<Invoice> getByPatient(int patientId) {
-
-        String sql = "SELECT InvoiceID, PatientID, AppointmentID, Amount, DateIssued, Status " +
-                "FROM dbo.Invoice WHERE PatientID = ? ORDER BY DateIssued DESC";
-
         List<Invoice> list = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, patientId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-
-                    Invoice i = new Invoice();
-
-                    i.setInvoiceID(rs.getInt(1));
-                    i.setPatientID(rs.getInt(2));
-                    i.setAppointmentID(rs.getInt(3));
-                    i.setAmount(rs.getDouble(4));
-                    i.setDateIssued(rs.getTimestamp(5));
-                    i.setStatus(rs.getString(6));
-
-                    list.add(i);
-                }
+        Cursor cursor = db.getInvoicesByPatient(patientId);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToInvoice(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
         return list;
     }
 
-    public int insert(Invoice i) {
-
-        String sql = "INSERT INTO dbo.Invoice(PatientID, AppointmentID, Amount, DateIssued, Status) " +
-                "VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setInt(1, i.getPatientID());
-            stmt.setInt(2, i.getAppointmentID());
-            stmt.setDouble(3, i.getAmount());
-            stmt.setTimestamp(4, new Timestamp(i.getDateIssued().getTime()));
-            stmt.setString(5, i.getStatus());
-
-            stmt.executeUpdate();
-
-            try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next())
-                    return keys.getInt(1);
+    public List<Invoice> getAll() {
+        List<Invoice> list = new ArrayList<>();
+        Cursor cursor = db.getAllInvoices();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToInvoice(cursor));
             }
-
-        } catch (SQLException ex) {
-
-            if (ex.getErrorCode() == 2627 || ex.getErrorCode() == 2601)
-                throw new RuntimeException("An invoice already exists for this appointment.", ex);
-
-            throw new RuntimeException(ex);
+            cursor.close();
         }
-
-        return 0;
+        return list;
     }
 
     public int update(Invoice i) {
-
-        String sql = "UPDATE dbo.Invoice " +
-                "SET PatientID = ?, AppointmentID = ?, Amount = ?, DateIssued = ?, Status = ? " +
-                "WHERE InvoiceID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, i.getPatientID());
-            stmt.setInt(2, i.getAppointmentID());
-            stmt.setDouble(3, i.getAmount());
-            stmt.setTimestamp(4, new Timestamp(i.getDateIssued().getTime()));
-            stmt.setString(5, i.getStatus());
-            stmt.setInt(6, i.getInvoiceID());
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException ex) {
-
-            if (ex.getErrorCode() == 2627 || ex.getErrorCode() == 2601)
-                throw new RuntimeException("Another invoice already uses this appointment.", ex);
-
-            throw new RuntimeException(ex);
-        }
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_PATIENT_ID, i.getPatientId());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_INVOICE_DATE, i.getInvoiceDate());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_DUE_DATE, i.getDueDate());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_SUBTOTAL, i.getSubtotal());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_TAX, i.getTax());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_TOTAL, i.getTotal());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_STATUS, i.getStatus());
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_NOTES, i.getNotes());
+        return db.updateInvoice(i.getId(), cv);
     }
 
     public int updateStatus(int invoiceId, String status) {
-
-        String sql = "UPDATE dbo.Invoice SET Status = ? WHERE InvoiceID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, status);
-            stmt.setInt(2, invoiceId);
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableInvoice.COLUMN_STATUS, status);
+        return db.updateInvoice(invoiceId, cv);
     }
 
     public int delete(int id) {
+        return db.deleteInvoice(id);
+    }
 
-        String sql = "DELETE FROM dbo.Invoice WHERE InvoiceID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+    private Invoice cursorToInvoice(Cursor cursor) {
+        Invoice i = new Invoice();
+        i.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_ID)));
+        i.setPatientId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_PATIENT_ID)));
+        i.setInvoiceNumber(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_INVOICE_NUMBER)));
+        i.setInvoiceDate(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_INVOICE_DATE)));
+        i.setDueDate(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_DUE_DATE)));
+        i.setSubtotal(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_SUBTOTAL)));
+        i.setTax(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_TAX)));
+        i.setTotal(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_TOTAL)));
+        i.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_STATUS)));
+        i.setNotes(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableInvoice.COLUMN_NOTES)));
+        return i;
     }
 }

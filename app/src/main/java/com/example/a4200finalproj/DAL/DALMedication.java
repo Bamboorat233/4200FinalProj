@@ -1,146 +1,93 @@
-package com.example.comp4200project;
+package com.example.a4200finalproj.DAL;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
 
-import java.sql.*;
+import com.example.a4200finalproj.Models.Medication;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DALMedication extends DALBase {
+public class DALMedication {
+
+    private final DatabaseHelper db;
+
+    public DALMedication(Context context) {
+        db = DatabaseHelper.getInstance(context);
+    }
+
+    public long insert(Medication m) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableMedication.COLUMN_NAME, m.getName());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_GENERIC_NAME, m.getGenericName());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_DOSAGE, m.getDosage());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_FORM, m.getForm());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_MANUFACTURER, m.getManufacturer());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_SIDE_EFFECTS, m.getSideEffects());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_IS_ACTIVE, 1);
+        return db.insertMedication(cv);
+    }
 
     public Medication getById(int id) {
-
-        String sql = "SELECT MedID, Name, Dosage, Price, Quantity " +
-                "FROM dbo.Medication WHERE MedID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                if (!rs.next())
-                    return null;
-
-                Medication m = new Medication();
-
-                m.setMedID(rs.getInt(1));
-                m.setName(rs.getString(2));
-
-                String dosage = rs.getString(3);
-                m.setDosage(dosage == null ? "" : dosage);
-
-                m.setPrice(rs.getDouble(4));
-                m.setQuantity(rs.getInt(5));
-
-                return m;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Cursor cursor = db.getMedicationById(id);
+        if (cursor != null && cursor.moveToFirst()) {
+            Medication m = cursorToMedication(cursor);
+            cursor.close();
+            return m;
         }
-
         return null;
     }
 
     public List<Medication> getAll() {
-
-        String sql = "SELECT MedID, Name, Dosage, Price, Quantity " +
-                "FROM dbo.Medication ORDER BY Name";
-
         List<Medication> list = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-
-                Medication m = new Medication();
-
-                m.setMedID(rs.getInt(1));
-                m.setName(rs.getString(2));
-                String dosage = rs.getString(3);
-                m.setDosage(dosage == null ? "" : dosage);
-                m.setPrice(rs.getDouble(4));
-                m.setQuantity(rs.getInt(5));
-
-                list.add(m);
+        Cursor cursor = db.getAllMedications();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToMedication(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
         return list;
     }
 
-    public int insert(Medication m) {
-
-        String sql = "INSERT INTO dbo.Medication(Name, Dosage, Price, Quantity) " +
-                "VALUES (?, ?, ?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setString(1, m.getName());
-            stmt.setString(2, m.getDosage());
-            stmt.setDouble(3, m.getPrice());
-            stmt.setInt(4, m.getQuantity());
-
-            stmt.executeUpdate();
-
-            try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next())
-                    return keys.getInt(1);
+    public List<Medication> search(String query) {
+        List<Medication> list = new ArrayList<>();
+        Cursor cursor = db.searchMedications(query);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToMedication(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
-        return 0;
+        return list;
     }
 
     public int update(Medication m) {
-
-        String sql = "UPDATE dbo.Medication " +
-                "SET Name = ?, Dosage = ?, Price = ?, Quantity = ? " +
-                "WHERE MedID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, m.getName());
-            stmt.setString(2, m.getDosage());
-            stmt.setDouble(3, m.getPrice());
-            stmt.setInt(4, m.getQuantity());
-            stmt.setInt(5, m.getMedID());
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableMedication.COLUMN_NAME, m.getName());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_GENERIC_NAME, m.getGenericName());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_DOSAGE, m.getDosage());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_FORM, m.getForm());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_MANUFACTURER, m.getManufacturer());
+        cv.put(DatabaseHelper.TableMedication.COLUMN_SIDE_EFFECTS, m.getSideEffects());
+        return db.updateMedication(m.getId(), cv);
     }
 
     public int delete(int id) {
+        return db.deleteMedication(id);
+    }
 
-        String sql = "DELETE FROM dbo.Medication WHERE MedID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+    private Medication cursorToMedication(Cursor cursor) {
+        Medication m = new Medication();
+        m.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedication.COLUMN_ID)));
+        m.setName(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedication.COLUMN_NAME)));
+        m.setGenericName(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedication.COLUMN_GENERIC_NAME)));
+        m.setDosage(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedication.COLUMN_DOSAGE)));
+        m.setForm(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedication.COLUMN_FORM)));
+        m.setManufacturer(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedication.COLUMN_MANUFACTURER)));
+        m.setSideEffects(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedication.COLUMN_SIDE_EFFECTS)));
+        m.setIsActive(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedication.COLUMN_IS_ACTIVE)));
+        return m;
     }
 }

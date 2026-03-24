@@ -1,195 +1,97 @@
-package com.example.comp4200project;
+package com.example.a4200finalproj.DAL;
 
-import java.sql.*;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+
+import com.example.a4200finalproj.Models.MedicalRecord;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DALMedicalRecord extends DALBase {
+public class DALMedicalRecord {
+
+    private final DatabaseHelper db;
+
+    public DALMedicalRecord(Context context) {
+        db = DatabaseHelper.getInstance(context);
+    }
+
+    public long insert(MedicalRecord m) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_PATIENT_ID, m.getPatientId());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_DOCTOR_ID, m.getDoctorId());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_VISIT_DATE, m.getVisitDate());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_DIAGNOSIS, m.getDiagnosis());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_COMPLAINTS, m.getComplaints());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_TREATMENT, m.getTreatment());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_VITAL_SIGNS, m.getVitalSigns());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_NOTES, m.getNotes());
+        return db.insertMedicalRecord(cv);
+    }
 
     public MedicalRecord getById(int id) {
-
-        String sql = "SELECT RecordID, PatientID, DoctorID, Diagnosis, Treatment, VisitDate " +
-                "FROM dbo.MedicalRecord WHERE RecordID = ?";
-
-        try (Connection conn = DriverManager.getConnection(connStr);
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                if (!rs.next())
-                    return null;
-
-                MedicalRecord m = new MedicalRecord();
-
-                m.setRecordID(rs.getInt(1));
-                m.setPatientID(rs.getInt(2));
-                m.setDoctorID(rs.getInt(3));
-                String diagnosis = rs.getString(4);
-                m.setDiagnosis(diagnosis == null ? "" : diagnosis);
-                String treatment = rs.getString(5);
-                m.setTreatment(treatment == null ? "" : treatment);
-                m.setVisitDate(rs.getTimestamp(6));
-
-                return m;
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Cursor cursor = db.getMedicalRecordById(id);
+        if (cursor != null && cursor.moveToFirst()) {
+            MedicalRecord m = cursorToRecord(cursor);
+            cursor.close();
+            return m;
         }
-
         return null;
     }
 
     public List<MedicalRecord> getByPatient(int patientId) {
-
-        String sql = "SELECT RecordID, PatientID, DoctorID, Diagnosis, Treatment, VisitDate " +
-                "FROM dbo.MedicalRecord " +
-                "WHERE PatientID = ? " +
-                "ORDER BY VisitDate DESC";
-
         List<MedicalRecord> list = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, patientId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-
-                    MedicalRecord m = new MedicalRecord();
-
-                    m.setRecordID(rs.getInt(1));
-                    m.setPatientID(rs.getInt(2));
-                    m.setDoctorID(rs.getInt(3));
-                    String diagnosis = rs.getString(4);
-                    m.setDiagnosis(diagnosis == null ? "" : diagnosis);
-                    String treatment = rs.getString(5);
-                    m.setTreatment(treatment == null ? "" : treatment);
-                    m.setVisitDate(rs.getTimestamp(6));
-
-                    list.add(m);
-                }
+        Cursor cursor = db.getMedicalRecordsByPatient(patientId);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToRecord(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
         return list;
     }
 
     public List<MedicalRecord> getByDoctor(int doctorId) {
-
-        String sql = "SELECT RecordID, PatientID, DoctorID, Diagnosis, Treatment, VisitDate " +
-                "FROM dbo.MedicalRecord " +
-                "WHERE DoctorID = ? " +
-                "ORDER BY VisitDate DESC";
-
         List<MedicalRecord> list = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, doctorId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                while (rs.next()) {
-
-                    MedicalRecord m = new MedicalRecord();
-
-                    m.setRecordID(rs.getInt(1));
-                    m.setPatientID(rs.getInt(2));
-                    m.setDoctorID(rs.getInt(3));
-                    String diagnosis = rs.getString(4);
-                    m.setDiagnosis(diagnosis == null ? "" : diagnosis);
-                    String treatment = rs.getString(5);
-                    m.setTreatment(treatment == null ? "" : treatment);
-                    m.setVisitDate(rs.getTimestamp(6));
-
-                    list.add(m);
-                }
+        Cursor cursor = db.getMedicalRecordsByDoctor(doctorId);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToRecord(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
         return list;
     }
 
-    public int insert(MedicalRecord m) {
-
-        String sql = "INSERT INTO dbo.MedicalRecord(PatientID, DoctorID, Diagnosis, Treatment, VisitDate) " +
-                "VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setInt(1, m.getPatientID());
-            stmt.setInt(2, m.getDoctorID());
-            stmt.setString(3, m.getDiagnosis());
-            stmt.setString(4, m.getTreatment());
-            stmt.setTimestamp(5, new Timestamp(m.getVisitDate().getTime()));
-
-            stmt.executeUpdate();
-
-            try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next())
-                    return keys.getInt(1);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
     public int update(MedicalRecord m) {
-
-        String sql = "UPDATE dbo.MedicalRecord " +
-                "SET PatientID = ?, DoctorID = ?, Diagnosis = ?, Treatment = ?, VisitDate = ? " +
-                "WHERE RecordID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, m.getPatientID());
-            stmt.setInt(2, m.getDoctorID());
-            stmt.setString(3, m.getDiagnosis());
-            stmt.setString(4, m.getTreatment());
-            stmt.setTimestamp(5, new Timestamp(m.getVisitDate().getTime()));
-            stmt.setInt(6, m.getRecordID());
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_PATIENT_ID, m.getPatientId());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_DOCTOR_ID, m.getDoctorId());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_VISIT_DATE, m.getVisitDate());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_DIAGNOSIS, m.getDiagnosis());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_COMPLAINTS, m.getComplaints());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_TREATMENT, m.getTreatment());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_VITAL_SIGNS, m.getVitalSigns());
+        cv.put(DatabaseHelper.TableMedicalRecord.COLUMN_NOTES, m.getNotes());
+        return db.updateMedicalRecord(m.getId(), cv);
     }
 
     public int delete(int id) {
+        return db.deleteMedicalRecord(id);
+    }
 
-        String sql = "DELETE FROM dbo.MedicalRecord WHERE RecordID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+    private MedicalRecord cursorToRecord(Cursor cursor) {
+        MedicalRecord m = new MedicalRecord();
+        m.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedicalRecord.COLUMN_ID)));
+        m.setPatientId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedicalRecord.COLUMN_PATIENT_ID)));
+        m.setDoctorId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedicalRecord.COLUMN_DOCTOR_ID)));
+        m.setVisitDate(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedicalRecord.COLUMN_VISIT_DATE)));
+        m.setDiagnosis(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedicalRecord.COLUMN_DIAGNOSIS)));
+        m.setComplaints(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedicalRecord.COLUMN_COMPLAINTS)));
+        m.setTreatment(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedicalRecord.COLUMN_TREATMENT)));
+        m.setVitalSigns(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedicalRecord.COLUMN_VITAL_SIGNS)));
+        m.setNotes(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableMedicalRecord.COLUMN_NOTES)));
+        return m;
     }
 }

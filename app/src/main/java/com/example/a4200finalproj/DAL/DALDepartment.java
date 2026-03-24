@@ -1,133 +1,75 @@
-package com.example.comp4200project;
+package com.example.a4200finalproj.DAL;
 
-import java.sql.*;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+
+import com.example.a4200finalproj.Models.Department;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DALDepartment extends DALBase {
+public class DALDepartment {
+
+    private final DatabaseHelper db;
+
+    public DALDepartment(Context context) {
+        db = DatabaseHelper.getInstance(context);
+    }
+
+    public long insert(Department d) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableDepartment.COLUMN_NAME, d.getName());
+        cv.put(DatabaseHelper.TableDepartment.COLUMN_DESCRIPTION, d.getDescription());
+        cv.put(DatabaseHelper.TableDepartment.COLUMN_LOCATION, d.getLocation());
+        cv.put(DatabaseHelper.TableDepartment.COLUMN_PHONE, d.getPhone());
+        cv.put(DatabaseHelper.TableDepartment.COLUMN_IS_ACTIVE, 1);
+        return db.insertDepartment(cv);
+    }
 
     public Department getById(int id) {
-
-        String sql = "SELECT DepartmentID, Name, Location " +
-                "FROM dbo.Department WHERE DepartmentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql)) {
-
-            cmd.setInt(1, id);
-            ResultSet rs = cmd.executeQuery();
-
-            if (!rs.next()) {
-                throw new RuntimeException("Department not found.");
-            }
-
-            Department d = new Department();
-            d.setDepartmentID(rs.getInt(1));
-            d.setName(rs.getString(2));
-            d.setLocation(rs.getString(3) == null ? "" : rs.getString(3));
-
+        Cursor cursor = db.getDepartmentById(id);
+        if (cursor != null && cursor.moveToFirst()) {
+            Department d = cursorToDepartment(cursor);
+            cursor.close();
             return d;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-
         return null;
     }
 
-
     public List<Department> getAll() {
-
-        String sql = "SELECT DepartmentID, Name, Location " +
-                "FROM dbo.Department ORDER BY Name";
-
         List<Department> list = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql);
-             ResultSet rs = cmd.executeQuery()) {
-
-            while (rs.next()) {
-
-                Department d = new Department();
-                d.setDepartmentID(rs.getInt(1));
-                d.setName(rs.getString(2));
-                d.setLocation(rs.getString(3) == null ? "" : rs.getString(3));
-
-                list.add(d);
+        Cursor cursor = db.getAllDepartments();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToDepartment(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
         return list;
     }
 
-
-    public int insert(Department d) {
-
-        String sql = "INSERT INTO dbo.Department(Name, Location) VALUES(?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            cmd.setString(1, d.getName());
-            cmd.setString(2, d.getLocation());
-
-            cmd.executeUpdate();
-
-            ResultSet keys = cmd.getGeneratedKeys();
-            if (keys.next()) {
-                return keys.getInt(1);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
-
     public int update(Department d) {
-
-        String sql = "UPDATE dbo.Department " +
-                "SET Name = ?, Location = ? " +
-                "WHERE DepartmentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql)) {
-
-            cmd.setString(1, d.getName());
-            cmd.setString(2, d.getLocation());
-            cmd.setInt(3, d.getDepartmentID());
-
-            return cmd.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TableDepartment.COLUMN_NAME, d.getName());
+        cv.put(DatabaseHelper.TableDepartment.COLUMN_DESCRIPTION, d.getDescription());
+        cv.put(DatabaseHelper.TableDepartment.COLUMN_LOCATION, d.getLocation());
+        cv.put(DatabaseHelper.TableDepartment.COLUMN_PHONE, d.getPhone());
+        return db.updateDepartment(d.getId(), cv);
     }
-
 
     public int delete(int id) {
+        return db.deleteDepartment(id);
+    }
 
-        String sql = "DELETE FROM dbo.Department WHERE DepartmentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement cmd = conn.prepareStatement(sql)) {
-
-            cmd.setInt(1, id);
-
-            return cmd.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
+    private Department cursorToDepartment(Cursor cursor) {
+        Department d = new Department();
+        d.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableDepartment.COLUMN_ID)));
+        d.setName(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableDepartment.COLUMN_NAME)));
+        d.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableDepartment.COLUMN_DESCRIPTION)));
+        d.setLocation(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableDepartment.COLUMN_LOCATION)));
+        d.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TableDepartment.COLUMN_PHONE)));
+        d.setIsActive(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TableDepartment.COLUMN_IS_ACTIVE)));
+        return d;
     }
 }
