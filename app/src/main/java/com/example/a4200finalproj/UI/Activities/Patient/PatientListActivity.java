@@ -32,7 +32,7 @@ public class PatientListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient_list);
 
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper = DatabaseHelper.getInstance(this);
 
         rvPatients = findViewById(R.id.rvPatients);
         etSearchPatient = findViewById(R.id.etSearchPatient);

@@ -3,10 +3,10 @@ package com.example.a4200finalproj.UI.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -42,10 +42,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navigationView);
+
+        tvWelcome = findViewById(R.id.tvWelcome);
+        tvRole = findViewById(R.id.tvRole);
+        btnLogout = findViewById(R.id.btnLogout);
+        btnPatients = findViewById(R.id.btnPatients);
+        btnDoctors = findViewById(R.id.btnDoctors);
+
+        setSupportActionBar(toolbar);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
@@ -53,12 +59,6 @@ public class MainActivity extends AppCompatActivity {
         );
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
-        tvWelcome = findViewById(R.id.tvWelcome);
-        tvRole = findViewById(R.id.tvRole);
-        btnLogout = findViewById(R.id.btnLogout);
-        btnPatients = findViewById(R.id.btnPatients);
-        btnDoctors = findViewById(R.id.btnDoctors);
 
         String username = sessionManager.getUsername();
         String role = sessionManager.getRole();
@@ -107,11 +107,18 @@ public class MainActivity extends AppCompatActivity {
     private void applyRoleVisibility(String role) {
         Menu menu = navigationView.getMenu();
 
-        boolean canAccessDoctors = "Admin".equalsIgnoreCase(role) || "Doctor".equalsIgnoreCase(role);
+        boolean isAdmin = "Admin".equalsIgnoreCase(role);
+        boolean isDoctor = "Doctor".equalsIgnoreCase(role);
+        boolean isNurse = "Nurse".equalsIgnoreCase(role);
+        boolean isReceptionist = "Receptionist".equalsIgnoreCase(role);
 
-        btnDoctors.setEnabled(canAccessDoctors);
-        btnDoctors.setVisibility(canAccessDoctors ? android.view.View.VISIBLE : android.view.View.GONE);
+        boolean canAccessPatients = isAdmin || isDoctor || isNurse || isReceptionist;
+        boolean canAccessDoctors = isAdmin || isDoctor;
 
+        btnPatients.setVisibility(canAccessPatients ? View.VISIBLE : View.GONE);
+        btnDoctors.setVisibility(canAccessDoctors ? View.VISIBLE : View.GONE);
+
+        menu.findItem(R.id.nav_patients).setVisible(canAccessPatients);
         menu.findItem(R.id.nav_doctors).setVisible(canAccessDoctors);
     }
 

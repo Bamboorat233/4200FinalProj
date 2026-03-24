@@ -849,4 +849,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String generateInvoiceNumber() {
         return "INV-" + System.currentTimeMillis();
     }
+
+    //added for empty users
+    public void seedDefaultUsersIfNeeded() {
+        if (!isUsernameExists("admin")) {
+            ContentValues values = new ContentValues();
+            values.put(TableUser.COLUMN_USERNAME, "admin");
+            values.put(TableUser.COLUMN_PASSWORD, "admin123");
+            values.put(TableUser.COLUMN_EMAIL, "admin@hospital.com");
+            values.put(TableUser.COLUMN_FULL_NAME, "System Admin");
+            values.put(TableUser.COLUMN_ROLE, "Admin");
+            values.put(TableUser.COLUMN_PHONE, "555-1000");
+            values.put(TableUser.COLUMN_ADDRESS, "Main Office");
+            values.put(TableUser.COLUMN_IS_ACTIVE, 1);
+            insertUser(values);
+        }
+
+        if (!isUsernameExists("doctor1")) {
+            ContentValues values = new ContentValues();
+            values.put(TableUser.COLUMN_USERNAME, "doctor1");
+            values.put(TableUser.COLUMN_PASSWORD, "doctor123");
+            values.put(TableUser.COLUMN_EMAIL, "doctor1@hospital.com");
+            values.put(TableUser.COLUMN_FULL_NAME, "Demo Doctor");
+            values.put(TableUser.COLUMN_ROLE, "Doctor");
+            values.put(TableUser.COLUMN_PHONE, "555-2000");
+            values.put(TableUser.COLUMN_ADDRESS, "Doctor Office");
+            values.put(TableUser.COLUMN_IS_ACTIVE, 1);
+            insertUser(values);
+        }
+
+        if (!isUsernameExists("nurse1")) {
+            ContentValues values = new ContentValues();
+            values.put(TableUser.COLUMN_USERNAME, "nurse1");
+            values.put(TableUser.COLUMN_PASSWORD, "nurse123");
+            values.put(TableUser.COLUMN_EMAIL, "nurse1@hospital.com");
+            values.put(TableUser.COLUMN_FULL_NAME, "Demo Nurse");
+            values.put(TableUser.COLUMN_ROLE, "Nurse");
+            values.put(TableUser.COLUMN_PHONE, "555-3000");
+            values.put(TableUser.COLUMN_ADDRESS, "Nurse Station");
+            values.put(TableUser.COLUMN_IS_ACTIVE, 1);
+            insertUser(values);
+        }
+
+        if (!isUsernameExists("reception1")) {
+            ContentValues values = new ContentValues();
+            values.put(TableUser.COLUMN_USERNAME, "reception1");
+            values.put(TableUser.COLUMN_PASSWORD, "reception123");
+            values.put(TableUser.COLUMN_EMAIL, "reception1@hospital.com");
+            values.put(TableUser.COLUMN_FULL_NAME, "Demo Receptionist");
+            values.put(TableUser.COLUMN_ROLE, "Receptionist");
+            values.put(TableUser.COLUMN_PHONE, "555-4000");
+            values.put(TableUser.COLUMN_ADDRESS, "Front Desk");
+            values.put(TableUser.COLUMN_IS_ACTIVE, 1);
+            insertUser(values);
+        }
+    }
 }

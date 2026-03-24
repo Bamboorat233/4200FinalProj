@@ -28,7 +28,7 @@ public class PatientFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient_form);
 
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper = DatabaseHelper.getInstance(this);
 
         etPatientFullName = findViewById(R.id.etPatientFullName);
         etPatientDob = findViewById(R.id.etPatientDob);

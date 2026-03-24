@@ -28,7 +28,7 @@ public class DoctorListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_list);
 
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper = DatabaseHelper.getInstance(this);
 
         rvDoctors = findViewById(R.id.rvDoctors);
         btnAddDoctor = findViewById(R.id.btnAddDoctor);

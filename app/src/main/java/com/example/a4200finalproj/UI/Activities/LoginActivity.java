@@ -29,7 +29,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper = DatabaseHelper.getInstance(this);
+        databaseHelper.seedDefaultUsersIfNeeded();
         sessionManager = new SessionManager(this);
 
         if (sessionManager.isLoggedIn()) {
@@ -96,4 +97,6 @@ public class LoginActivity extends AppCompatActivity {
         tvError.setText(message);
         tvError.setVisibility(View.VISIBLE);
     }
+
+
 }

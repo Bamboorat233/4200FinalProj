@@ -28,7 +28,7 @@ public class DoctorFormActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_doctor_form);
 
-        databaseHelper = new DatabaseHelper(this);
+        databaseHelper = DatabaseHelper.getInstance(this);
 
         etDoctorFullName = findViewById(R.id.etDoctorFullName);
         etDoctorSpecialization = findViewById(R.id.etDoctorSpecialization);
