@@ -12,6 +12,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.a4200finalproj.DAL.DatabaseHelper;
+import com.example.a4200finalproj.DAL.DataSeeder;
+import com.example.a4200finalproj.DAL.DALUser;
 import com.example.a4200finalproj.Helpers.SessionManager;
 import com.example.a4200finalproj.R;
 
@@ -31,6 +33,13 @@ public class LoginActivity extends AppCompatActivity {
 
         databaseHelper = DatabaseHelper.getInstance(this);
         databaseHelper.seedDefaultUsersIfNeeded();
+
+        // Seed test data if database is empty (check via Patient table)
+        if (!databaseHelper.hasAnyPatients()) {
+            DataSeeder seeder = new DataSeeder(this);
+            seeder.seedAllData();
+        }
+
         sessionManager = new SessionManager(this);
 
         if (sessionManager.isLoggedIn()) {

@@ -518,6 +518,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.delete(TablePatient.TABLE_NAME, TablePatient.COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
+    public boolean hasAnyPatients() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT 1 FROM " + TablePatient.TABLE_NAME + " LIMIT 1", null);
+        boolean hasData = cursor != null && cursor.getCount() > 0;
+        if (cursor != null) cursor.close();
+        return hasData;
+    }
+
     // ==================== Appointment CRUD ====================
 
     public long insertAppointment(ContentValues values) {
