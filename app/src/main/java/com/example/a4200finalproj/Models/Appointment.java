@@ -1,62 +1,64 @@
-package com.example.comp4200project;
-
-import java.sql.Date;
-import java.sql.Time;
-import java.sql.Timestamp;
+package com.example.a4200finalproj.Models;
 
 public class Appointment {
+    private int id;
+    private int patientId;
+    private int doctorId;
+    private int departmentId;
+    private String appointmentDate;
+    private String appointmentTime;
+    private String reason;
+    private String status;
+    private String notes;
+    private String createdAt;
+    private String updatedAt;
 
-    public int AppointmentID;
-    public int PatientID;
-    public int DoctorID;
-    public Date AppointmentDate;
-    public Time AppointmentTime; //SQL TIME
-    public String Status;
+    // Display-only fields
+    private String patientName;
+    private String doctorName;
+    private String departmentName;
 
-    public int getAppointmentID() {
-        return AppointmentID;
-    }
+    public Appointment() {}
 
-    public void setAppointmentID(int AppointmentID) {
-        this.AppointmentID = AppointmentID;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public int getPatientID() {
-        return PatientID;
-    }
+    public int getPatientId() { return patientId; }
+    public void setPatientId(int patientId) { this.patientId = patientId; }
 
-    public void setPatientID(int PatientID) {
-        this.PatientID = PatientID;
-    }
+    public int getDoctorId() { return doctorId; }
+    public void setDoctorId(int doctorId) { this.doctorId = doctorId; }
 
-    public int getDoctorID() {
-        return DoctorID;
-    }
+    public int getDepartmentId() { return departmentId; }
+    public void setDepartmentId(int departmentId) { this.departmentId = departmentId; }
 
-    public void setDoctorID(int DoctorID) {
-        this.DoctorID = DoctorID;
-    }
+    public String getAppointmentDate() { return appointmentDate; }
+    public void setAppointmentDate(String appointmentDate) { this.appointmentDate = appointmentDate; }
 
-    public Date getAppointmentDate() {
-        return AppointmentDate;
-    }
+    public String getAppointmentTime() { return appointmentTime; }
+    public void setAppointmentTime(String appointmentTime) { this.appointmentTime = appointmentTime; }
 
-    public void setAppointmentDate(Date AppointmentDate) {
-        this.AppointmentDate = AppointmentDate;
-    }
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
 
-    public Time getAppointmentTime() {
-        return AppointmentTime;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setAppointmentTime(Time AppointmentTime) {
-        this.AppointmentTime = AppointmentTime;
-    }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 
-    public String getStatus(){return Status;}
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
-    public void setStatus(String status){this.Status = Status;}
+    public String getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
 
+    public String getPatientName() { return patientName; }
+    public void setPatientName(String patientName) { this.patientName = patientName; }
 
+    public String getDoctorName() { return doctorName; }
+    public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
 
+    public String getDepartmentName() { return departmentName; }
+    public void setDepartmentName(String departmentName) { this.departmentName = departmentName; }
 }

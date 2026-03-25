@@ -1,165 +1,92 @@
 package com.example.a4200finalproj.DAL;
 
-import java.sql.*;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+
+import com.example.a4200finalproj.Models.Patient;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DALPatient extends DALBase {
+public class DALPatient {
 
-    public void addPatient(Patient p) {
+    private final DatabaseHelper db;
 
-        String sql =
-                "INSERT INTO Patient (Name, DOB, Gender, Contact, [Address]) " +
-                        "VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, p.getName());
-            stmt.setDate(2, new java.sql.Date(p.getDOB().getTime()));
-            stmt.setString(3, p.getGender());
-            stmt.setString(4, p.getContact());
-            stmt.setString(5, p.getAddress());
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public DALPatient(Context context) {
+        db = DatabaseHelper.getInstance(context);
     }
 
+    public long addPatient(Patient p) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TablePatient.COLUMN_FULL_NAME, p.getFullName());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_DATE_OF_BIRTH, p.getDateOfBirth());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_GENDER, p.getGender());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_PHONE, p.getPhone());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_EMAIL, p.getEmail());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_ADDRESS, p.getAddress());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_EMERGENCY_CONTACT, p.getEmergencyContact());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_EMERGENCY_PHONE, p.getEmergencyPhone());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_BLOOD_TYPE, p.getBloodType());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_ALLERGIES, p.getAllergies());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_IS_ACTIVE, 1);
+        return db.insertPatient(cv);
+    }
 
     public Patient getById(int patientId) {
-
-        String sql =
-                "SELECT PatientID, Name, DOB, Gender, Contact, [Address] " +
-                        "FROM Patient " +
-                        "WHERE PatientID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, patientId);
-
-            ResultSet rs = stmt.executeQuery();
-
-            if (!rs.next()) return null;
-
-            Patient p = new Patient();
-            p.setPatientID(rs.getInt("PatientID"));
-            p.setName(rs.getString("Name"));
-            p.setDOB(rs.getDate("DOB"));
-            p.setGender(rs.getString("Gender"));
-            p.setContact(rs.getString("Contact"));
-            p.setAddress(rs.getString("Address"));
-
+        Cursor cursor = db.getPatientById(patientId);
+        if (cursor != null && cursor.moveToFirst()) {
+            Patient p = cursorToPatient(cursor);
+            cursor.close();
             return p;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-
         return null;
     }
 
-
-    public int deleteById(int patientId) {
-
-        String sql = "DELETE FROM Patient WHERE PatientID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, patientId);
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
-
-    public int updateContactById(int patientId, String newContact) {
-
-        String sql = "UPDATE Patient SET Contact = ? WHERE PatientID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, newContact);
-            stmt.setInt(2, patientId);
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
-
-    public int updatePatient(Patient p) {
-
-        String sql =
-                "UPDATE Patient " +
-                        "SET Name = ?, DOB = ?, Gender = ?, Contact = ?, [Address] = ? " +
-                        "WHERE PatientID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, p.getName());
-            stmt.setDate(2, new java.sql.Date(p.getDOB().getTime()));
-            stmt.setString(3, p.getGender());
-            stmt.setString(4, p.getContact());
-            stmt.setString(5, p.getAddress());
-            stmt.setInt(6, p.getPatientID());
-
-            return stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return 0;
-    }
-
-
     public List<Patient> getAllPatients() {
-
-        String sql = "SELECT PatientID, Name, DOB, Gender, Contact, [Address] " +
-                "FROM Patient " +
-                "ORDER BY Name";
-
         List<Patient> patients = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-
-                Patient p = new Patient();
-
-                p.setPatientID(rs.getInt("PatientID"));
-                p.setName(rs.getString("Name"));
-                p.setDOB(rs.getDate("DOB"));
-                p.setGender(rs.getString("Gender"));
-                p.setContact(rs.getString("Contact"));
-                p.setAddress(rs.getString("Address"));
-
-                patients.add(p);
+        Cursor cursor = db.getAllPatients();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                patients.add(cursorToPatient(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
         return patients;
     }
-}
 
+    public int updatePatient(Patient p) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TablePatient.COLUMN_FULL_NAME, p.getFullName());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_DATE_OF_BIRTH, p.getDateOfBirth());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_GENDER, p.getGender());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_PHONE, p.getPhone());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_EMAIL, p.getEmail());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_ADDRESS, p.getAddress());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_EMERGENCY_CONTACT, p.getEmergencyContact());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_EMERGENCY_PHONE, p.getEmergencyPhone());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_BLOOD_TYPE, p.getBloodType());
+        cv.put(DatabaseHelper.TablePatient.COLUMN_ALLERGIES, p.getAllergies());
+        return db.updatePatient(p.getId(), cv);
+    }
+
+    public int deleteById(int patientId) {
+        return db.deletePatient(patientId);
+    }
+
+    private Patient cursorToPatient(Cursor cursor) {
+        Patient p = new Patient();
+        p.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_ID)));
+        p.setFullName(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_FULL_NAME)));
+        p.setDateOfBirth(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_DATE_OF_BIRTH)));
+        p.setGender(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_GENDER)));
+        p.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_PHONE)));
+        p.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_EMAIL)));
+        p.setAddress(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_ADDRESS)));
+        p.setEmergencyContact(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_EMERGENCY_CONTACT)));
+        p.setEmergencyPhone(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_EMERGENCY_PHONE)));
+        p.setBloodType(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_BLOOD_TYPE)));
+        p.setAllergies(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePatient.COLUMN_ALLERGIES)));
+        return p;
+    }
+}

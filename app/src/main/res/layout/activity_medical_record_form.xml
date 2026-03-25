@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Patient ID" />
+
+            <EditText
+                android:id="@+id/etPatientId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter Patient ID"
+                android:inputType="number" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Doctor"
+                android:layout_marginTop="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerDoctor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Visit Date"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/etVisitDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="YYYY-MM-DD"
+                android:focusable="false" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Complaints"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/etComplaints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Patient complaints"
+                android:inputType="textMultiLine"
+                android:minLines="2" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Diagnosis"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/etDiagnosis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter diagnosis"
+                android:inputType="textMultiLine"
+                android:minLines="2" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Treatment"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/etTreatment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter treatment"
+                android:inputType="textMultiLine"
+                android:minLines="2" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Vital Signs"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/etVitalSigns"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="e.g. BP: 120/80, HR: 72"
+                android:inputType="text" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Notes"
+                android:layout_marginTop="8dp" />
+
+            <EditText
+                android:id="@+id/etNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Additional notes"
+                android:inputType="textMultiLine"
+                android:minLines="2" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Save" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -1,64 +1,50 @@
-package com.example.comp4200project;
-
-import java.sql.Date;
-import java.sql.Timestamp;
+package com.example.a4200finalproj.Models;
 
 public class User {
+    private int id;
+    private String username;
+    private String password;
+    private String email;
+    private String fullName;
+    private String role;
+    private String phone;
+    private String address;
+    private int isActive;
+    private String createdAt;
+    private String updatedAt;
 
-    public int UserID;
-    public String Username;
-    public String Password;
-    public String Role; //Admin, Doctor, Nurse, Receptionist
-    public String Email;
-    public Timestamp CreatedDate;
-    public boolean isActive;
+    public User() {}
 
-    public int getUserID(){
-        return UserID;
-    }
-    public void setUserID(int UserID){
-        this.UserID = UserID;
-    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public String getUsername(){
-        return Username;
-    }
-    public void setUsername(String Username){
-        this.Username = Username;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
-    public String getPassword(){
-        return Password;
-    }
-    public void setPassword(String Password){
-        this.Password = Password;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getRole(){
-        return Role;
-    }
-    public void setRole(String Role){
-        this.Role = Role;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail(){
-        return Email;
-    }
-    public void setEmail(String Email){
-        this.Email = Email;
-    }
+    public String getFullName() { return fullName; }
+    public void setFullName(String fullName) { this.fullName = fullName; }
 
-    public Timestamp getCreatedDate(){
-        return CreatedDate;
-    }
-    public void setCreatedDate(Timestamp CreatedDate){
-        this.CreatedDate = CreatedDate;
-    }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
-    public boolean getisActive(){
-        return isActive;
-    }
-    public void setisActive(boolean isActive){
-        this.isActive = isActive;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public int getIsActive() { return isActive; }
+    public void setIsActive(int isActive) { this.isActive = isActive; }
+
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public String getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
 }

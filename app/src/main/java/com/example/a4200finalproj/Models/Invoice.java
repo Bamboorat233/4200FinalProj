@@ -1,42 +1,60 @@
-package com.example.comp4200project;
-
-import java.sql.Date;
-import java.sql.Timestamp;
+package com.example.a4200finalproj.Models;
 
 public class Invoice {
+    private int id;
+    private int patientId;
+    private String invoiceNumber;
+    private String invoiceDate;
+    private String dueDate;
+    private double subtotal;
+    private double tax;
+    private double total;
+    private String status;
+    private String notes;
+    private String createdAt;
+    private String updatedAt;
 
-    public int InvoiceID;
-    public int PatientID;
-    public int AppointmentID;
-    public double Amount;
-    public Timestamp DateIssued;
-    public String Status;
+    // Display-only
+    private String patientName;
 
-    public Invoice(){
-        InvoiceID=0;
-        PatientID=0;
-        AppointmentID=0;
-        Amount=0.0;
-        DateIssued = null;
-        Status = "Unpaid";
-    }
+    public Invoice() {}
 
-    public int getInvoiceID(){return InvoiceID;}
-    public void setInvoiceID(int InvoiceID){this.InvoiceID = InvoiceID;}
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public int getPatientID(){return PatientID;}
-    public void setPatientID(int PatientID){this.PatientID = PatientID;}
+    public int getPatientId() { return patientId; }
+    public void setPatientId(int patientId) { this.patientId = patientId; }
 
-    public int getAppointmentID(){return AppointmentID;}
-    public void setAppointmentID(int AppointmentID){this.AppointmentID = AppointmentID;}
+    public String getInvoiceNumber() { return invoiceNumber; }
+    public void setInvoiceNumber(String invoiceNumber) { this.invoiceNumber = invoiceNumber; }
 
-     public double getAmount(){return Amount;}
-    public void setAmount(double Amount){this.Amount = Amount;}
+    public String getInvoiceDate() { return invoiceDate; }
+    public void setInvoiceDate(String invoiceDate) { this.invoiceDate = invoiceDate; }
 
-    public Timestamp getDateIssued(){return DateIssued;}
-    public void setDateIssued(Timestamp DateIssued){this.DateIssued = DateIssued;}
+    public String getDueDate() { return dueDate; }
+    public void setDueDate(String dueDate) { this.dueDate = dueDate; }
 
-    public String getStatus(){return Status;}
-    public void setStatus(String Status){this.Status = Status;}
+    public double getSubtotal() { return subtotal; }
+    public void setSubtotal(double subtotal) { this.subtotal = subtotal; }
+
+    public double getTax() { return tax; }
+    public void setTax(double tax) { this.tax = tax; }
+
+    public double getTotal() { return total; }
+    public void setTotal(double total) { this.total = total; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
+
+    public String getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getPatientName() { return patientName; }
+    public void setPatientName(String patientName) { this.patientName = patientName; }
 }
-

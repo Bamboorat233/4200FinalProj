@@ -1,124 +1,109 @@
-package com.example.comp4200project;
+package com.example.a4200finalproj.DAL;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.sql.Statement;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+
+import com.example.a4200finalproj.Models.Payment;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DALPayment extends DALBase {
+public class DALPayment {
 
-    // CREATE
-    public void addPayment(Payment p) {
-        String sql = "INSERT INTO Payment (InvoiceID, PaymentDate, Amount, PaymentMethod) " +
-                "VALUES (?, ?, ?, ?)";
+    private final DatabaseHelper db;
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, p.getInvoiceID());
-            stmt.setTimestamp(2, new Timestamp(p.getPaymentDate().getTime()));
-            stmt.setDouble(3, p.getAmount());
-            stmt.setString(4, p.getPaymentMethod());
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public DALPayment(Context context) {
+        db = DatabaseHelper.getInstance(context);
     }
 
-    // READ - get one
+    public long addPayment(Payment p) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TablePayment.COLUMN_INVOICE_ID, p.getInvoiceId());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_PATIENT_ID, p.getPatientId());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_AMOUNT, p.getAmount());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_PAYMENT_DATE, p.getPaymentDate());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_PAYMENT_METHOD, p.getPaymentMethod());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_TRANSACTION_ID, p.getTransactionId());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_STATUS, p.getStatus());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_NOTES, p.getNotes());
+        return db.insertPayment(cv);
+    }
+
     public Payment getPaymentById(int id) {
-        String sql = "SELECT PaymentID, InvoiceID, PaymentDate, Amount, PaymentMethod " +
-                "FROM Payment WHERE PaymentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Payment p = new Payment();
-                    p.setPaymentID(rs.getInt(1));
-                    p.setInvoiceID(rs.getInt(2));
-                    p.setPaymentDate(rs.getTimestamp(3));
-                    p.setAmount(rs.getDouble(4));
-                    p.setPaymentMethod(rs.getString(5));
-                    return p;
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Cursor cursor = db.getPaymentById(id);
+        if (cursor != null && cursor.moveToFirst()) {
+            Payment p = cursorToPayment(cursor);
+            cursor.close();
+            return p;
         }
-
         return null;
     }
 
-    // READ - get all
     public List<Payment> getAllPayments() {
-        String sql = "SELECT PaymentID, InvoiceID, PaymentDate, Amount, PaymentMethod FROM Payment";
         List<Payment> list = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Payment p = new Payment();
-                p.setPaymentID(rs.getInt(1));
-                p.setInvoiceID(rs.getInt(2));
-                p.setPaymentDate(rs.getTimestamp(3));
-                p.setAmount(rs.getDouble(4));
-                p.setPaymentMethod(rs.getString(5));
-                list.add(p);
+        Cursor cursor = db.getAllPayments();
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToPayment(cursor));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+            cursor.close();
         }
-
         return list;
     }
 
-    // UPDATE
-    public void updatePayment(Payment p) {
-        String sql = "UPDATE Payment SET InvoiceID = ?, PaymentDate = ?, Amount = ?, PaymentMethod = ? " +
-                "WHERE PaymentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, p.getInvoiceID());
-            stmt.setTimestamp(2, new Timestamp(p.getPaymentDate().getTime()));
-            stmt.setDouble(3, p.getAmount());
-            stmt.setString(4, p.getPaymentMethod());
-            stmt.setInt(5, p.getPaymentID());
-
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public List<Payment> getByInvoice(int invoiceId) {
+        List<Payment> list = new ArrayList<>();
+        Cursor cursor = db.getPaymentsByInvoice(invoiceId);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToPayment(cursor));
+            }
+            cursor.close();
         }
+        return list;
     }
 
-    // DELETE
-    public void deletePayment(int id) {
-        String sql = "DELETE FROM Payment WHERE PaymentID = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public List<Payment> getByPatient(int patientId) {
+        List<Payment> list = new ArrayList<>();
+        Cursor cursor = db.getPaymentsByPatient(patientId);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                list.add(cursorToPayment(cursor));
+            }
+            cursor.close();
         }
+        return list;
+    }
+
+    public int updatePayment(Payment p) {
+        ContentValues cv = new ContentValues();
+        cv.put(DatabaseHelper.TablePayment.COLUMN_INVOICE_ID, p.getInvoiceId());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_PATIENT_ID, p.getPatientId());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_AMOUNT, p.getAmount());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_PAYMENT_DATE, p.getPaymentDate());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_PAYMENT_METHOD, p.getPaymentMethod());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_TRANSACTION_ID, p.getTransactionId());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_STATUS, p.getStatus());
+        cv.put(DatabaseHelper.TablePayment.COLUMN_NOTES, p.getNotes());
+        return db.updatePayment(p.getId(), cv);
+    }
+
+    public int deletePayment(int id) {
+        return db.deletePayment(id);
+    }
+
+    private Payment cursorToPayment(Cursor cursor) {
+        Payment p = new Payment();
+        p.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePayment.COLUMN_ID)));
+        p.setInvoiceId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePayment.COLUMN_INVOICE_ID)));
+        p.setPatientId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePayment.COLUMN_PATIENT_ID)));
+        p.setAmount(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePayment.COLUMN_AMOUNT)));
+        p.setPaymentDate(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePayment.COLUMN_PAYMENT_DATE)));
+        p.setPaymentMethod(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePayment.COLUMN_PAYMENT_METHOD)));
+        p.setTransactionId(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePayment.COLUMN_TRANSACTION_ID)));
+        p.setStatus(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePayment.COLUMN_STATUS)));
+        p.setNotes(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.TablePayment.COLUMN_NOTES)));
+        return p;
     }
 }

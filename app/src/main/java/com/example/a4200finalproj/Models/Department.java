@@ -1,23 +1,38 @@
-package com.example.comp4200project;
+package com.example.a4200finalproj.Models;
 
 public class Department {
+    private int id;
+    private String name;
+    private String description;
+    private String location;
+    private String phone;
+    private int isActive;
+    private String createdAt;
+    private String updatedAt;
 
-    public int DepartmentID;
-    public String Name;
-    public String Location;
+    public Department() {}
 
-    public int getDepartmentID() {return DepartmentID;}
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public void setDepartmentID(int DepartmentID){this.DepartmentID = DepartmentID;}
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {return Name;}
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public void setName(String Name){this.Name = Name;}
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
-    public String getLocation() {return Location;}
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public void setLocation(String Location){this.Location = Location;}
+    public int getIsActive() { return isActive; }
+    public void setIsActive(int isActive) { this.isActive = isActive; }
 
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
-
+    public String getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
 }
