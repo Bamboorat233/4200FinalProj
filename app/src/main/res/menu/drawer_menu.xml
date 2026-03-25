@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_dashboard"
-        android:title="Dashboard" />
-    <item
-        android:id="@+id/nav_patients"
-        android:title="Patients" />
-    <item
-        android:id="@+id/nav_doctors"
-        android:title="Doctors" />
-    <item
-        android:id="@+id/nav_logout"
-        android:title="Logout" />
+    <item android:id="@+id/nav_dashboard" android:title="Dashboard" />
+    <item android:id="@+id/nav_patients" android:title="Patients" />
+    <item android:id="@+id/nav_doctors" android:title="Doctors" />
+    <item android:id="@+id/nav_appointments" android:title="Appointments" />
+    <item android:id="@+id/nav_departments" android:title="Departments" />
+    <item android:id="@+id/nav_medical_records" android:title="Medical Records" />
+    <item android:id="@+id/nav_medications" android:title="Medications" />
+    <item android:id="@+id/nav_prescriptions" android:title="Prescriptions" />
+    <item android:id="@+id/nav_invoices" android:title="Invoices" />
+    <item android:id="@+id/nav_payments" android:title="Payments" />
+    <item android:id="@+id/nav_reports" android:title="Reports" />
+    <item android:id="@+id/nav_users" android:title="User Management" />
+    <item android:id="@+id/nav_logout" android:title="Logout" />
 </menu>

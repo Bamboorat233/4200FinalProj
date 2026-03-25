@@ -18,49 +18,118 @@
             android:title="Main Dashboard"
             android:titleTextColor="@android:color/white" />
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="24dp">
+            android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/tvWelcome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Welcome"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvRole"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Role"
-                android:textSize="18sp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="24dp" />
-
-            <Button
-                android:id="@+id/btnPatients"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Patient Management"
-                android:layout_marginBottom="12dp" />
+                android:orientation="vertical"
+                android:padding="24dp">
 
-            <Button
-                android:id="@+id/btnDoctors"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Doctor Management"
-                android:layout_marginBottom="12dp" />
+                <TextView
+                    android:id="@+id/tvWelcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnLogout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Logout" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tvRole"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Role"
+                    android:textSize="18sp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="24dp" />
+
+                <Button
+                    android:id="@+id/btnPatients"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Patient Management"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnDoctors"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Doctor Management"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnAppointments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Appointment Management"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnDepartments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Department Management"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnMedicalRecords"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Medical Records"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnMedications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Medications"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnPrescriptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Prescriptions"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnInvoices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Invoices"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnPayments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Payments"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnReports"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Reports"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnUsers"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="User Management"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnLogout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Logout" />
+
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -70,4 +139,5 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/drawer_menu" />
+
 </androidx.drawerlayout.widget.DrawerLayout>
